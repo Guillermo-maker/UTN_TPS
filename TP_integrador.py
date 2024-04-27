@@ -19,6 +19,8 @@ elif len(cp) == 7:
     destrino= "Chile"
 elif len(cp) == 6:
     destino= "Paraguay"
+else:
+    print("Verificar el codigo postal")
 
 if destino == "Argentina":
     if 'a' in cp[0]:
