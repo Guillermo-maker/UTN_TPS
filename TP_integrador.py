@@ -1,6 +1,6 @@
 cp = input ("Ingrese el código postal del lugar de destino: ").lower()
 direccion = input("Dirección del lugar de destino: ")
-tipo = int(input("Tipo de envío (id entre 0 y 6 - ver tabla 2 en el enunciado): "))
+tipo = int(input("Tipo de envío (id entre 0 y 6): "))
 pago = int(input("Forma de pago (1: efectivo - 2: tarjeta): "))
 destino = ""
 provincia = ""
@@ -78,9 +78,26 @@ if destino == "Argentina":
     else:
         print("Error en la provincia")
 
+# Tabla 2 - Tipo envio 
+
+if tipo == "0":
+    incial = 1100
+elif tipo == "1":
+     incial = 1800
+elif  tipo == "2":
+    incial = 2450
+elif tipo  == "3":
+    incial = 8300
+elif tipo == "4": 
+    inical = 10900
+elif  tipo == "5":
+    incial = 14300
+elif tipo  == "6":
+    inicial =17900
+ 
 
 print("Provincia destino:", provincia)
-    
+
 
 
 
