@@ -68,8 +68,19 @@ def calcular_importe_inicial(tipo, cp, pais):
             incremento = incrementos_internacionales['Brasil_4_7']
         else:
             incremento = incrementos_internacionales['Brasil_8_9']
+    elif pais == 'Bolivia':
+        incremento = incrementos_internacionales['Bolivia']
+    elif pais == 'Paraguay':
+        incremento = incrementos_internacionales['Paraguay']
+    elif pais == 'Uruguay':
+        if cp.startswith('11'):
+            incremento = incrementos_internacionales['Uruguay_Montevideo']
+        else:
+            incremento = incrementos_internacionales['Uruguay']
+    elif pais == 'Chile':
+        incremento = incrementos_internacionales['Chile']
     else:
-        incremento = incrementos_internacionales.get(pais.replace(' ', '_'), 0.50)
+        incremento = incrementos_internacionales['Otros']
     return int(base * (1 + incremento))
 
 def calcular_importe_final(inicial, pago):
@@ -100,8 +111,18 @@ if __name__ == "__main__":
 # Parte 2 
 
 # Leer el archivo
-with open('envios.txt', 'r') as file:
+with open('envios25.txt', 'r') as file:
     lines = file.readlines()
+
+# Definir la función para procesar las líneas
+def lectura_archivo(lines):
+    for line in lines:
+        # Procesar cada línea
+        print(line.strip())  # Ejemplo: imprimir la línea sin espacios en blanco alrededor
+
+# Llamar a la función con las líneas leídas del archivo
+lectura_archivo(lines)
+
 
 # Leer la primera línea (timestamp)
 timestamp_line = lines[0].strip().split()
@@ -145,12 +166,15 @@ for line in lines[1:]:
             invalid_count += 1
             continue  # Saltar a la siguiente línea si la dirección es inválida
 
+    if control_type == 'SC':
+
+
     # Calcular monto inicial
     if cp.startswith('A'):
         provincia = 'Buenos Aires'
     else:
         provincia = obtener_provincia(cp)
-    
+
     # Determinar país del destino
     if len(cp) == 8 and cp[0].isalpha() and cp[1:5].isdigit() and cp[5:].isalpha():
         pais = 'Argentina'
@@ -166,7 +190,7 @@ for line in lines[1:]:
         pais = 'Uruguay'
     else:
         pais = 'Otros'
-    
+
     # Calcular el importe inicial
     importe_inicial = precios_nacionales[delivery_type]
     if pais != 'Argentina':
@@ -189,7 +213,7 @@ for line in lines[1:]:
         else:
             incremento = 1.50
         importe_inicial = int(importe_inicial * incremento)
-    
+
     # Calcular el importe final
     if payment_method == 1:
         importe_final = int(importe_inicial * 0.90)
