@@ -69,182 +69,52 @@ def calcular_importe_inicial(tipo, cp, pais):
         else:
             incremento = incrementos_internacionales['Brasil_8_9']
     else:
-        incremento = incrementos_internacionales.get(pais.replace(' ', '_'), 0.50)
-    return int(base * (1 + incremento))
+        print("Error en la provincia")
 
-def calcular_importe_final(inicial, pago):
-    if pago == 1:
-        return int(inicial * 0.90)  # 10% de descuento
-    return inicial
+# Tabla 2 - Tipo envio 
 
-def main():
-    cp = ""
-    direccion = ""
-    tipo = ""
-    pago = ""
+if tipo == "0":
+    incial = 1100
+elif tipo == "1":
+     incial = 1800
+elif  tipo == "2":
+    incial = 2450
+elif tipo  == "3":
+    incial = 8300
+elif tipo == "4": 
+    inical = 10900
+elif  tipo == "5":
+    incial = 14300
+elif tipo  == "6":
+    inicial =17900
+ 
+ #Tabla 3
 
-    destino = obtener_pais(cp)
-    provincia = obtener_provincia(cp) if destino == 'Argentina' else 'No aplica'
-    inicial = calcular_importe_inicial(tipo, cp, destino)
-    final = calcular_importe_final(inicial, pago)
+if destino == "Bolivia" or  destino == "Paraguay":
+    final = inicial + (inicial * 0.2)
+elif  destino == "Uruguay" and is_montevideo == True:
+    final = inicial + (inicial *0.2)
+elif destino  == "Chile":
+    final=inicial+ (inicial*0.25)
+elif destino == "Uruguay" and is_montevideo == False:
+    final=inicial+ (inicial*0.25)
+elif destino == "Brazil" and ("8" in cp[0] or "9" in cp[0]):
+    final = inicial + (inicial *0.2)
+elif destino == "Brazil" and ("0" in cp[0] or"1" in cp[0] or "2" in cp[0]) :
+    final = inicial + (inicial *0.25)
+elif destino == "Brazil" and ("4" in cp[0] or "5" in cp[0] or "6" in cp[0] or "7" in cp[0]) :
+    final = inicial + (inicial *0.3)
+else:
+    final = inicial + (inicial*0.5)
 
-    print("País de destino del envío:", destino)
-    print("Provincia destino:", provincia)
-    print("Importe inicial a pagar:", inicial)
-    print("Importe final a pagar:", final)
 
-# Ejecutar el programa
-if __name__ == "__main__":
-    main()
+print("Provincia destino:", provincia)
+print("País de destino del envío:", destino)
+print("Importe inicial a pagar:", inicial)
+print("Importe final a pagar:", final) 
 
-# Parte 2 
 
-# Leer el archivo
-with open('envios.txt', 'r') as file:
-    lines = file.readlines()
 
-# Leer la primera línea (timestamp)
-timestamp_line = lines[0].strip().split()
-control_type = timestamp_line[2]
 
-# Inicializar variables para estadísticas
-valid_count = 0
-invalid_count = 0
-total_amount = 0
-simple_count = 0
-certified_count = 0
-express_count = 0
-delivery_types_count = [0] * 7  # Contadores para cada tipo de envío
-first_cp = None
-first_cp_count = 0
-min_brazil_amount = float('inf')
-min_brazil_cp = ''
-international_count = 0
-buenos_aires_amounts = []
 
-# Procesar cada línea de datos
-for line in lines[1:]:
-    cp = line[:9].strip()
-    address = line[9:29].strip()
-    delivery_type = int(line[29])
-    payment_method = int(line[30])
 
-    # Validar dirección (solo si el control es HC)
-    if control_type == 'HC':
-        valid_address = True
-        if not address.replace(' ', '').isalnum():
-            valid_address = False
-        if any(c.isupper() and address[i+1].isupper() for i, c in enumerate(address[:-1])):
-            valid_address = False
-        if not any(c.isdigit() for c in address):
-            valid_address = False
-
-        if valid_address:
-            valid_count += 1
-        else:
-            invalid_count += 1
-            continue  # Saltar a la siguiente línea si la dirección es inválida
-
-    # Calcular monto inicial
-    if cp.startswith('A'):
-        provincia = 'Buenos Aires'
-    else:
-        provincia = obtener_provincia(cp)
-    
-    # Determinar país del destino
-    if len(cp) == 8 and cp[0].isalpha() and cp[1:5].isdigit() and cp[5:].isalpha():
-        pais = 'Argentina'
-    elif len(cp) == 4 and cp.isdigit():
-        pais = 'Bolivia'
-    elif len(cp) == 9 and cp[:5].isdigit() and cp[5] == '-' and cp[6:].isdigit():
-        pais = 'Brasil'
-    elif len(cp) == 7 and cp.isdigit():
-        pais = 'Chile'
-    elif len(cp) == 6 and cp.isdigit():
-        pais = 'Paraguay'
-    elif len(cp) == 5 and cp.isdigit():
-        pais = 'Uruguay'
-    else:
-        pais = 'Otros'
-    
-    # Calcular el importe inicial
-    importe_inicial = precios_nacionales[delivery_type]
-    if pais != 'Argentina':
-        if pais == 'Bolivia':
-            incremento = 1.20
-        elif pais == 'Paraguay':
-            incremento = 1.20
-        elif pais == 'Uruguay' and cp.startswith('11'):
-            incremento = 1.20
-        elif pais == 'Chile':
-            incremento = 1.25
-        elif pais == 'Uruguay':
-            incremento = 1.25
-        elif pais == 'Brasil' and cp[0] in '0123':
-            incremento = 1.25
-        elif pais == 'Brasil' and cp[0] in '4567':
-            incremento = 1.30
-        elif pais == 'Brasil':
-            incremento = 1.20
-        else:
-            incremento = 1.50
-        importe_inicial = int(importe_inicial * incremento)
-    
-    # Calcular el importe final
-    if payment_method == 1:
-        importe_final = int(importe_inicial * 0.90)
-    else:
-        importe_final = importe_inicial
-
-    total_amount += importe_final
-
-    # Contar los tipos de envío
-    delivery_types_count[delivery_type] += 1
-    if delivery_type in [0, 1, 2]:
-        simple_count += 1
-    elif delivery_type in [3, 4]:
-        certified_count += 1
-    elif delivery_type in [5, 6]:
-        express_count += 1
-
-    # Primer CP y su frecuencia
-    if first_cp is None:
-        first_cp = cp
-        first_cp_count = 1
-    elif first_cp == cp:
-        first_cp_count += 1
-
-    # Envíos a Brasil
-    if pais == 'Brasil' and importe_final < min_brazil_amount:
-        min_brazil_amount = importe_final
-        min_brazil_cp = cp
-
-    # Contar envíos internacionales
-    if pais != 'Argentina':
-        international_count += 1
-
-    # Acumular montos para Buenos Aires
-    if cp.startswith('B'):
-        buenos_aires_amounts.append(importe_final)
-
-# Estadísticas adicionales
-most_frequent_type = delivery_types_count.index(max(delivery_types_count))
-total_deliveries = sum(delivery_types_count)
-international_percentage = (international_count / total_deliveries) * 100 if total_deliveries else 0
-average_buenos_aires = sum(buenos_aires_amounts) / len(buenos_aires_amounts) if buenos_aires_amounts else 0
-
-# Imprimir resultados
-print(' (r1) - Tipo de control de direcciones:', control)
-print(' (r2) - Cantidad de envios con direccion valida:', cedvalid)
-print(' (r3) - Cantidad de envios con direccion no valida:', cedinvalid)
-print(' (r4) - Total acumulado de importes finales:', imp_acu_total)
-print(' (r5) - Cantidad de cartas simples:', ccs)
-print(' (r6) - Cantidad de cartas certificadas:', ccc)
-print(' (r7) - Cantidad de cartas expresas:', cce)
-print(' (r8) - Tipo de carta con mayor cantidad de envios:', tipo_mayor)
-print(' (r9) - Codigo postal del primer envio del archivo:', primer_cp)
-print('(r10) - Cantidad de veces que entro ese primero:', cant_primer_cp)
-print('(r11) - Importe menor pagado por envios a Brasil:', menimp)
-print('(r12) - Codigo postal del envio a Brasil con importe menor:', mencp)
-print('(r13) - Porcentaje de envios al exterior sobre el total:', porc)
-print('(r14) - Importe final promedio de los envios Buenos Aires:', prom)
