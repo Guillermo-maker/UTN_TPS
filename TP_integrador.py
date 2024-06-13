@@ -102,105 +102,121 @@ if __name__ == "__main__":
 
 # Parte 2
 
-# Leer el archivo
-with open('envios25.txt', 'r') as file:
-    lines = file.readlines()
+def procesar_envios():
+    # Leer el archivo
+    with open('envios25.txt', 'r') as file:
+        lines = file.readlines()
 
-# Leer la primera línea (timestamp)
-timestamp_line = lines[0].strip().split()
-control = timestamp_line[2]
+    # Leer la primera línea completa y verificar si contiene "HC" o "SC"
+    timestamp_line = lines[0].strip()
+    if "HC" in timestamp_line:
+        control = "HC"
+    elif "SC" in timestamp_line:
+        control = "SC"
 
-# Inicializar variables para estadísticas
-cedvalid = 0
-cedinvalid = 0
-imp_acu_total = 0
-ccs = 0
-ccc = 0
-cce = 0
-tipos_de_carta = [0] * 7  # Contadores para cada tipo de envío
-primer_cp = None
-cantidad_primer_cp = 0
-menimp = float('inf')
-mencp = ''
-cantidad_envios_exteriores = 0
-montos_envios_buenos_aires = []
+    # Inicializar variables para estadísticas
+    cedvalid = 0
+    cedinvalid = 0
+    imp_acu_total = 0
+    ccs = 0
+    ccc = 0
+    cce = 0
+    tipos_carta = [0] * 7  # Contadores para cada tipo de envío
+    primer_cp = None
+    cant_primer_cp = 0
+    menimp = float('inf')
+    mencp = ''
+    cant_ext = 0
+    montos_buenos_aires = []
 
-# Procesar cada línea de datos
-for line in lines[1:]:
-    codigo_postal = line[:9].strip()
-    direccion_envio = line[9:29].strip()
-    tipo_envio = int(line[29])
-    metodo_pago = int(line[30])
+    # Procesar cada línea de datos
+    for line in lines[1:]:
+        cp = line[:9].strip()
+        address = line[9:29].strip()
+        delivery_type = int(line[29])
+        payment_method = int(line[30])
 
-    # Validar dirección (solo si el control es HC)
-    if control == 'HC':
-        direccion_valida = True
-        if not direccion_envio.replace(' ', '').isalnum():
-            direccion_valida = False
-        if any(c.isupper() and direccion_envio[i+1].isupper() for i, c in enumerate(direccion_envio[:-1])):
-            direccion_valida = False
-        if not any(c.isdigit() for c in direccion_envio):
-            direccion_valida = False
+        # Validar dirección (solo si el control es HC)
+        if control == 'HC':
+            valid_address = True
+            if any(c.isupper() and address[i+1].isupper() for i, c in enumerate(address[:-1])):
+                valid_address = False
+            if not any(c.isdigit() for c in address):
+                valid_address = False
 
-        if direccion_valida:
+            if valid_address:
+                cedvalid += 1
+            else:
+                cedinvalid += 1
+        if control == "SC":
             cedvalid += 1
-        else:
-            cedinvalid += 1
-            continue  # Saltar a la siguiente línea si la dirección es inválida
 
-    # Calcular monto inicial y final
-    pais_destino = obtener_pais(codigo_postal)
-    importe_inicial = calcular_importe_inicial(tipo_envio, codigo_postal, pais_destino)
-    importe_final = calcular_importe_final(importe_inicial, metodo_pago)
-    imp_acu_total += importe_final
+        # Calcular monto inicial y final
+        pais = obtener_pais(cp)
+        inicial = calcular_importe_inicial(delivery_type, cp, pais)
+        final = calcular_importe_final(inicial, payment_method)
+        imp_acu_total += final
 
-    # Contar los tipos de envío
-    tipos_de_carta[tipo_envio] += 1
-    if tipo_envio in [0, 1, 2]:
-        ccs += 1
-    elif tipo_envio in [3, 4]:
-        ccc += 1
-    elif tipo_envio in [5, 6]:
-        cce += 1
+        # Contar los tipos de envío
+        tipos_carta[delivery_type] += 1
+        if delivery_type in [0, 1, 2]:
+            ccs += 1
+        elif delivery_type in [3, 4]:
+            ccc += 1
+        elif delivery_type in [5, 6]:
+            cce += 1
 
-    # Primer CP y su frecuencia
-    if primer_cp is None:
-        primer_cp = codigo_postal
-        cantidad_primer_cp = 1
-    elif primer_cp == codigo_postal:
-        cantidad_primer_cp += 1
+        # Primer CP y su frecuencia
+        if primer_cp is None:
+            primer_cp = cp
+            cant_primer_cp = 1
+        elif primer_cp == cp:
+            cant_primer_cp += 1
 
-    # Envíos a Brasil
-    if pais_destino == 'Brasil' and importe_final < menimp:
-        menimp = importe_final
-        mencp = codigo_postal
+        # Envíos a Brasil
+        if pais == 'Brasil' and final < menimp:
+            menimp = final
+            mencp = cp
 
-    # Contar envíos internacionales
-    if pais_destino != 'Argentina':
-        cantidad_envios_exteriores += 1
+        # Contar envíos internacionales
+        if pais != 'Argentina':
+            cant_ext += 1
 
-    # Acumular montos para Buenos Aires
-    if codigo_postal.startswith('B'):
-        montos_envios_buenos_aires.append(importe_final)
+        # Acumular montos para Buenos Aires
+        if cp.startswith('B'):
+            montos_buenos_aires.append(final)
 
-# Estadísticas adicionales
-tipo_mayor = tipos_de_carta.index(max(tipos_de_carta))
-total_envios = sum(tipos_de_carta)
-porc = (cantidad_envios_exteriores / total_envios) * 100 if total_envios else 0
-prom = sum(montos_envios_buenos_aires) / len(montos_envios_buenos_aires) if montos_envios_buenos_aires else 0
+        # Debugging: Imprimir el estado actual de las variables
+        print(f"Procesado CP: {cp}, País: {pais}, Inicial: {inicial}, Final: {final}")
+        print(f"cedvalid: {cedvalid}, cedinvalid: {cedinvalid}, imp_acu_total: {imp_acu_total}")
+        print(f"ccs: {ccs}, ccc: {ccc}, cce: {cce}")
+        print(f"primer_cp: {primer_cp}, cant_primer_cp: {cant_primer_cp}")
+        print(f"menimp: {menimp}, mencp: {mencp}")
+        print(f"cant_ext: {cant_ext}, montos_buenos_aires: {montos_buenos_aires}")
 
-# Imprimir resultados
-print(' (r1) - Tipo de control de direcciones:', control)
-print(' (r2) - Cantidad de envíos con dirección válida:', cedvalid)
-print(' (r3) - Cantidad de envíos con dirección no válida:', cedinvalid)
-print(' (r4) - Total acumulado de importes finales:', imp_acu_total)
-print(' (r5) - Cantidad de cartas simples:', ccs)
-print(' (r6) - Cantidad de cartas certificadas:', ccc)
-print(' (r7) - Cantidad de cartas expresas:', cce)
-print(' (r8) - Tipo de carta con mayor cantidad de envíos:', tipo_mayor)
-print(' (r9) - Código postal del primer envío del archivo:', primer_cp)
-print('(r10) - Cantidad de veces que entró ese primero:', cantidad_primer_cp)
-print('(r11) - Importe menor pagado por envíos a Brasil:', menimp)
-print('(r12) - Código postal del envío a Brasil con importe menor:', mencp)
-print('(r13) - Porcentaje de envíos al exterior sobre el total:', porc)
-print('(r14) - Importe final promedio de los envíos Buenos Aires:', prom)
+    # Estadísticas adicionales
+    tipo_mayor = tipos_carta.index(max(tipos_carta))
+    total_envios = sum(tipos_carta)
+    porc = (cant_ext / total_envios) * 100 if total_envios else 0
+    prom = sum(montos_buenos_aires) / len(montos_buenos_aires) if montos_buenos_aires else 0
+
+    # Imprimir resultados
+    print(' (r1) - Tipo de control de direcciones:', control)
+    print(' (r2) - Cantidad de envíos con dirección válida:', cedvalid)
+    print(' (r3) - Cantidad de envíos con dirección no válida:', cedinvalid)
+    print(' (r4) - Total acumulado de importes finales:', imp_acu_total)
+    print(' (r5) - Cantidad de cartas simples:', ccs)
+    print(' (r6) - Cantidad de cartas certificadas:', ccc)
+    print(' (r7) - Cantidad de cartas expresas:', cce)
+    print(' (r8) - Tipo de carta con mayor cantidad de envíos:', tipo_mayor)
+    print(' (r9) - Código postal del primer envío del archivo:', primer_cp)
+    print('(r10) - Cantidad de veces que entró ese primero:', cant_primer_cp)
+    print('(r11) - Importe menor pagado por envíos a Brasil:', menimp)
+    print('(r12) - Código postal del envío a Brasil con importe menor:', mencp)
+    print('(r13) - Porcentaje de envíos al exterior sobre el total:', porc)
+    print('(r14) - Importe final promedio de los envíos Buenos Aires:', prom)
+
+# Ejecutar el bucle while
+while True:
+    procesar_envios()
+    break  # Aquí puedes cambiar la condición para detener el bucle cuando sea necesario
