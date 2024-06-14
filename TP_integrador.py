@@ -120,7 +120,7 @@ cedvalid = 0
 cedinvalid = 0
 
 # Lectura del archivo envios25.txt
-with open("envios25.txt", "r") as archivo:
+with open("envios100HC.txt", "r") as archivo:
     lineas = archivo.readlines()
 
 # Procesamiento de timestamp (en este caso, asumiendo solo la primera línea como timestamp)
@@ -156,12 +156,6 @@ for linea in lineas[1:]:
     inicial = calcular_importe_inicial(tipo_envio, cp, pais)
     final = calcular_importe_final(inicial, tipo_pago)
     tipos_carta[tipo_envio] += 1
-    print("Pais: ", pais, " CP: ", cp, " Importe a pagar: ", final)
-
-    # Acumular montos para Buenos Aires
-    if cp.startswith("B"):
-        montos_buenos_aires.append(final)
-        prom = sum(montos_buenos_aires) / len(montos_buenos_aires)
 
     # Validar dirección según el tipo de control
     if control == "Hard Control":
@@ -181,15 +175,20 @@ for linea in lineas[1:]:
     elif es_valida and tipo_envio in [5, 6]:
         cce += 1
 
+    # Acumular montos para Buenos Aires
+    if cp.startswith("B") and es_valida:
+        montos_buenos_aires.append(final)
+        prom = sum(montos_buenos_aires) / len(montos_buenos_aires)
+
     # Calcular monto inicial y final(NO ANDA Y NO SE PORQUE AAAAAAAAAAAAAAAAAAAA)
     if es_valida:
         imp_acu_total += final
 
     # Primer codigo postal del archivo y cuantas veces aparece
-    if primer_cp is None and es_valida:
+    if primer_cp is None:
         primer_cp = cp
         cant_primer_cp = 1
-    elif primer_cp == cp and es_valida:
+    elif primer_cp == cp:
         cant_primer_cp += 1
 
     tipo_mayor = ""
@@ -208,7 +207,7 @@ for linea in lineas[1:]:
     porc = (cant_ext / total_envios) * 100
 
     # Para los filtros de brasil
-    if pais == "Brasil" and es_valida and final < menimp:
+    if pais == "Brasil" and final < menimp:
         menimp = final
         mencp = cp
 
