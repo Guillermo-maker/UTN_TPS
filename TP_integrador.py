@@ -138,6 +138,12 @@ cce = 0
 cant_primer_cp = 0
 primer_cp = None
 
+menimp = float()
+mencp = ''
+
+cant_ext = 0
+montos_buenos_aires = []
+
 # Iterar sobre las líneas de envíos
 for linea in lineas[1:]:
     cp = linea[:9].strip()  # Código postal, primeros 9 caracteres
@@ -147,19 +153,29 @@ for linea in lineas[1:]:
     pais = obtener_pais(cp)
     inicial = calcular_importe_inicial(tipo_envio, cp, pais)
     final = calcular_importe_final(inicial, tipo_pago)
-    tipos_carta[tipo_envio] = 1
+    tipos_carta[tipo_envio] += 1
     
+
+    # Acumular montos para Buenos Aires
+    if cp.startswith('B'):
+        montos_buenos_aires.append(final)
+        prom = sum(montos_buenos_aires) / len(montos_buenos_aires)
+
+
+    
+
     
 
     # Validar dirección según el tipo de control
     if control == "Hard Control":
         es_valida = validar_direccion_hard_control(direccion)
     else:
-        es_valida = True  # Para Soft Control, cualquier dirección es válida
+        es_valida = True
     if es_valida:
         cedvalid += 1
     else:
         cedinvalid += 1
+
     # Contar los tipos de envío
     if es_valida and tipo_envio in [0,1,2]:
         ccs +=1
@@ -167,9 +183,11 @@ for linea in lineas[1:]:
         ccc +=1
     elif es_valida and tipo_envio in [5,6]:
         cce +=1
+
     # Calcular monto inicial y final(NO ANDA Y NO SE PORQUE AAAAAAAAAAAAAAAAAAAA)
     if es_valida:
         imp_acu_total += final
+
     # Primer codigo postal del archivo y cuantas veces aparece
     if primer_cp is None and es_valida:
         primer_cp = cp
@@ -185,7 +203,19 @@ for linea in lineas[1:]:
         tipo_mayor = "Carta certificada"
     elif mayor_envio in [5,6]:
         tipo_mayor = "Carta expresa"
-
+    # Contar envíos internacionales
+    if pais != 'Argentina' and es_valida:
+        cant_ext += 1
+    total_envios = sum(tipos_carta)
+    porc = (cant_ext / total_envios) * 100
+    
+# NO ANDA TAMPOCO Y NO SE PORQUE
+if pais == "Brasil" and final == 0 or final == None:
+    menimp = final
+    mencp = cp
+if pais == 'Brasil' and final < menimp:
+    menimp = final
+    mencp = cp
     
 
 
@@ -202,4 +232,7 @@ print(" (r7) - Cantidad de cartas expresas:", cce)
 print(' (r8) - Tipo de carta con mayor cantidad de envíos:', tipo_mayor)
 print(' (r9) - Código postal del primer envío del archivo:', primer_cp)
 print('(r10) - Cantidad de veces que entró ese primero:', cant_primer_cp)
-
+print('(r11) - Importe menor pagado por envíos a Brasil:', menimp)
+print('(r12) - Código postal del envío a Brasil con importe menor:', mencp)
+print('(r13) - Porcentaje de envíos al exterior sobre el total:', porc)
+print('(r14) - Importe final promedio de los envíos Buenos Aires:', prom)
