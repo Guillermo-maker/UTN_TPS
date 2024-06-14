@@ -135,6 +135,8 @@ tipos_carta = [0] * 7
 ccs = 0
 ccc = 0
 cce = 0
+cant_primer_cp = 0
+primer_cp = None
 
 # Iterar sobre las líneas de envíos
 for linea in lineas[1:]:
@@ -146,6 +148,9 @@ for linea in lineas[1:]:
     inicial = calcular_importe_inicial(tipo_envio, cp, pais)
     final = calcular_importe_final(inicial, tipo_pago)
     tipos_carta[tipo_envio] = 1
+    
+    
+
     # Validar dirección según el tipo de control
     if control == "Hard Control":
         es_valida = validar_direccion_hard_control(direccion)
@@ -162,10 +167,25 @@ for linea in lineas[1:]:
         ccc +=1
     elif es_valida and tipo_envio in [5,6]:
         cce +=1
-    # Calcular monto inicial y final
+    # Calcular monto inicial y final(NO ANDA Y NO SE PORQUE AAAAAAAAAAAAAAAAAAAA)
     if es_valida:
         imp_acu_total += final
+    # Primer codigo postal del archivo y cuantas veces aparece
+    if primer_cp is None and es_valida:
+        primer_cp = cp
+        cant_primer_cp = 1
+    elif primer_cp == cp and es_valida:
+        cant_primer_cp += 1
     
+    tipo_mayor = ""
+    mayor_envio = tipos_carta.index(max(tipos_carta))
+    if mayor_envio in [0,1,2]:
+        tipo_mayor = "Carta simple"
+    elif mayor_envio in [3,4]:
+        tipo_mayor = "Carta certificada"
+    elif mayor_envio in [5,6]:
+        tipo_mayor = "Carta expresa"
+
     
 
 
@@ -179,5 +199,7 @@ print(" (r4) - Total acumulado de importes finales:", imp_acu_total)
 print(" (r5) - Cantidad de cartas simples:", ccs)
 print(" (r6) - Cantidad de cartas certificadas:", ccc)
 print(" (r7) - Cantidad de cartas expresas:", cce)
-
+print(' (r8) - Tipo de carta con mayor cantidad de envíos:', tipo_mayor)
+print(' (r9) - Código postal del primer envío del archivo:', primer_cp)
+print('(r10) - Cantidad de veces que entró ese primero:', cant_primer_cp)
 
