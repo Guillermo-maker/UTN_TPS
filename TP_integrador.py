@@ -119,8 +119,8 @@ def calcular_importe_final(inicial, pago):
 cedvalid = 0
 cedinvalid = 0
 
-# Lectura del archivo envios25.txt
-with open("envios100HC.txt", "r") as archivo:
+# Lectura del archivo envios100SC.txt
+with open("envios100SC.txt", "r") as archivo:
     lineas = archivo.readlines()
 
 # Procesamiento de timestamp (en este caso, asumiendo solo la primera línea como timestamp)
@@ -130,7 +130,7 @@ control = ""
 if "HC" in timestamp:
     control = "Hard Control"
 else:
-    "Soft Control"
+    control = "Soft Control"
 
 imp_acu_total = 0
 tipos_carta = [0] * 7
@@ -156,6 +156,7 @@ for linea in lineas[1:]:
     inicial = calcular_importe_inicial(tipo_envio, cp, pais)
     final = calcular_importe_final(inicial, tipo_pago)
     tipos_carta[tipo_envio] += 1
+    print("Pais: ", pais, " CP: ", cp, " monto: ", final)
 
     # Validar dirección según el tipo de control
     if control == "Hard Control":
@@ -210,7 +211,6 @@ for linea in lineas[1:]:
     if pais == "Brasil" and final < menimp:
         menimp = final
         mencp = cp
-
 
 # Mostrar resultados
 print(f" (r1) - Tipo de control de direcciones:", control)
