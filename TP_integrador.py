@@ -76,7 +76,8 @@ def validar_direccion_hard_control(direccion):
 def obtener_pais(cp):
     for formato, pais in mapa_paises.items():
         if len(cp) == len(formato) and all(
-            (c.isdigit() if f == "N" else c.isalpha()) for c, f in zip(cp, formato)
+            (c.isdigit() if f == "N" else c.isalpha())
+            for c, f in zip(cp.replace("-", ""), formato.replace("-", ""))
         ):
             return pais
     return "Otros"
@@ -139,7 +140,7 @@ cce = 0
 cant_primer_cp = 0
 primer_cp = None
 
-menimp = float()
+menimp = float("inf")
 mencp = ""
 
 cant_ext = 0
@@ -155,6 +156,7 @@ for linea in lineas[1:]:
     inicial = calcular_importe_inicial(tipo_envio, cp, pais)
     final = calcular_importe_final(inicial, tipo_pago)
     tipos_carta[tipo_envio] += 1
+    print("Pais: ", pais, " CP: ", cp, " Importe a pagar: ", final)
 
     # Acumular montos para Buenos Aires
     if cp.startswith("B"):
@@ -205,13 +207,10 @@ for linea in lineas[1:]:
     total_envios = sum(tipos_carta)
     porc = (cant_ext / total_envios) * 100
 
-# NO ANDA TAMPOCO Y NO SE PORQUE
-if pais == "Brasil" and final == 0 or final == None:
-    menimp = final
-    mencp = cp
-if pais == "Brasil" and final < menimp:
-    menimp = final
-    mencp = cp
+    # Para los filtros de brasil
+    if pais == "Brasil" and es_valida and final < menimp:
+        menimp = final
+        mencp = cp
 
 
 # Mostrar resultados
