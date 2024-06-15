@@ -72,21 +72,23 @@ def validar_direccion_hard_control(direccion):
         return False
     return True
 
+def obtener_provincia(cp):
+    if cp[0] in mapa_provincias:
+        return mapa_provincias[cp[0]]
+    return "No aplica"
+
 
 def obtener_pais(cp):
+    provincia = obtener_provincia(cp)
     for formato, pais in mapa_paises.items():
         if len(cp) == len(formato) and all(
             (c.isdigit() if f == "N" else c.isalpha())
             for c, f in zip(cp.replace("-", ""), formato.replace("-", ""))
         ):
+            if pais == "Argentina" and provincia == "No aplica":
+                return "Otros"
             return pais
     return "Otros"
-
-
-def obtener_provincia(cp):
-    if cp[0] in mapa_provincias:
-        return mapa_provincias[cp[0]]
-    return "No aplica"
 
 
 def calcular_importe_inicial(tipo, cp, pais):
@@ -120,7 +122,7 @@ cedvalid = 0
 cedinvalid = 0
 
 # Lectura del archivo envios100SC.txt
-with open("envios100SC.txt", "r") as archivo:
+with open("envios500b.txt", "r") as archivo:
     lineas = archivo.readlines()
 
 # Procesamiento de timestamp (en este caso, asumiendo solo la primera línea como timestamp)
@@ -146,6 +148,7 @@ mencp = ""
 cant_ext = 0
 montos_buenos_aires = []
 
+
 # Iterar sobre las líneas de envíos
 for linea in lineas[1:]:
     cp = linea[:9].strip()  # Código postal, primeros 9 caracteres
@@ -156,7 +159,6 @@ for linea in lineas[1:]:
     inicial = calcular_importe_inicial(tipo_envio, cp, pais)
     final = calcular_importe_final(inicial, tipo_pago)
     tipos_carta[tipo_envio] += 1
-    print("Pais: ", pais, " CP: ", cp, " monto: ", final)
 
     # Validar dirección según el tipo de control
     if control == "Hard Control":
@@ -227,3 +229,5 @@ print("(r11) - Importe menor pagado por envíos a Brasil:", menimp)
 print("(r12) - Código postal del envío a Brasil con importe menor:", mencp)
 print("(r13) - Porcentaje de envíos al exterior sobre el total:", porc)
 print("(r14) - Importe final promedio de los envíos Buenos Aires:", prom)
+
+# while loop desea continuar?
