@@ -198,9 +198,9 @@ for linea in lineas[1:]:
         cce += 1
 
     # Acumular montos para Buenos Aires
-    if cp.startswith("B") and es_valida:
+    if cp.startswith("B") and es_valida and len(cp) == 8 and cp[1:5].isdigit() and cp[5:].isalpha():
         montos_buenos_aires.append(final)
-        prom = sum(montos_buenos_aires) / len(montos_buenos_aires)
+        prom = int(sum(montos_buenos_aires) / len(montos_buenos_aires))
 
     # Calcular monto inicial y final
     if es_valida:
