@@ -1,113 +1,133 @@
 import re
 
-# Diccionario de precios por tipo de envío y peso
-precios_nacionales = {0: 1100, 1: 1800, 2: 2450, 3: 8300, 4: 10900, 5: 14300, 6: 17900}
 
-# Incrementos de precio para envíos internacionales
-incrementos_internacionales = {
-    "Bolivia": 0.20,
-    "Paraguay": 0.20,
-    "Uruguay_Montevideo": 0.20,
-    "Chile": 0.25,
-    "Uruguay": 0.25,
-    "Brasil_0_3": 0.25,
-    "Brasil_4_7": 0.30,
-    "Brasil_8_9": 0.20,
-    "Otros": 0.50,
-}
+def obtener_precio_nacional(tipo):
+    if tipo == 0:
+        return 1100
+    elif tipo == 1:
+        return 1800
+    elif tipo == 2:
+        return 2450
+    elif tipo == 3:
+        return 8300
+    elif tipo == 4:
+        return 10900
+    elif tipo == 5:
+        return 14300
+    elif tipo == 6:
+        return 17900
+    else:
+        return 0  # En caso de un tipo de envío no válido
 
-# Mapas de códigos postales a países y provincias
-mapa_paises = {
-    "LNNNNLLL": "Argentina",
-    "NNNN": "Bolivia",
-    "NNNNN-NNN": "Brasil",
-    "NNNNNNN": "Chile",
-    "NNNNNN": "Paraguay",
-    "NNNNN": "Uruguay",
-}
 
-# Mapas de letras de provincias argentinas (ISO 3166-2:AR)
-mapa_provincias = {
-    "A": "Salta",
-    "B": "Buenos Aires",
-    "C": "Capital Federal",
-    "D": "San Luis",
-    "E": "Entre Ríos",
-    "F": "La Rioja",
-    "G": "Santiago del Estero",
-    "H": "Chaco",
-    "J": "San Juan",
-    "K": "Catamarca",
-    "L": "La Pampa",
-    "M": "Mendoza",
-    "N": "Misiones",
-    "P": "Formosa",
-    "Q": "Neuquén",
-    "R": "Río Negro",
-    "S": "Santa Fe",
-    "T": "Tucumán",
-    "U": "Chubut",
-    "V": "Tierra del Fuego",
-    "W": "Corrientes",
-    "X": "Córdoba",
-    "Y": "Jujuy",
-    "Z": "Santa Cruz",
-}
+def obtener_incremento_internacional(pais, cp):
+    if pais == "Bolivia" or pais == "Paraguay":
+        return 0.20
+    elif pais == "Uruguay_Montevideo":
+        return 0.20
+    elif pais == "Chile" or pais == "Uruguay":
+        return 0.25
+    elif pais == "Brasil":
+        region = int(cp[0])
+        if region in range(0, 4):
+            return 0.25
+        elif region in range(4, 8):
+            return 0.30
+        else:
+            return 0.20
+    else:
+        return 0.50  # Otros países
 
 
 def validar_direccion_hard_control(direccion):
-    # Reemplazar punto al final por espacio en blanco
     direccion = direccion.rstrip(".") + " "
-
-    # Validación específica para Hard Control
-    if not re.search(r"\d", direccion):  # Debe contener al menos un dígito
+    if not re.search(r"\d", direccion):
         return False
-    if re.search(r"[^a-zA-Z0-9 ]", direccion):  # Solo letras, dígitos y espacio
+    if re.search(r"[^a-zA-Z0-9 ]", direccion):
         return False
-    if re.search(r"[A-Z]{2}", direccion):  # No puede haber dos mayúsculas seguidas
+    if re.search(r"[A-Z]{2}", direccion):
         return False
-    if not re.search(
-        r"\b\d+\b", direccion
-    ):  # Debe haber al menos una palabra compuesta solo por dígitos
+    if not re.search(r"\b\d+\b", direccion):
         return False
     return True
 
+
 def obtener_provincia(cp):
-    if cp[0] in mapa_provincias:
-        return mapa_provincias[cp[0]]
-    return "No aplica"
+    if cp[0] == "A":
+        return "Salta"
+    elif cp[0] == "B":
+        return "Buenos Aires"
+    elif cp[0] == "C":
+        return "Capital Federal"
+    elif cp[0] == "D":
+        return "San Luis"
+    elif cp[0] == "E":
+        return "Entre Ríos"
+    elif cp[0] == "F":
+        return "La Rioja"
+    elif cp[0] == "G":
+        return "Santiago del Estero"
+    elif cp[0] == "H":
+        return "Chaco"
+    elif cp[0] == "J":
+        return "San Juan"
+    elif cp[0] == "K":
+        return "Catamarca"
+    elif cp[0] == "L":
+        return "La Pampa"
+    elif cp[0] == "M":
+        return "Mendoza"
+    elif cp[0] == "N":
+        return "Misiones"
+    elif cp[0] == "P":
+        return "Formosa"
+    elif cp[0] == "Q":
+        return "Neuquén"
+    elif cp[0] == "R":
+        return "Río Negro"
+    elif cp[0] == "S":
+        return "Santa Fe"
+    elif cp[0] == "T":
+        return "Tucumán"
+    elif cp[0] == "U":
+        return "Chubut"
+    elif cp[0] == "V":
+        return "Tierra del Fuego"
+    elif cp[0] == "W":
+        return "Corrientes"
+    elif cp[0] == "X":
+        return "Córdoba"
+    elif cp[0] == "Y":
+        return "Jujuy"
+    elif cp[0] == "Z":
+        return "Santa Cruz"
+    else:
+        return "No aplica"
 
 
 def obtener_pais(cp):
     provincia = obtener_provincia(cp)
-    for formato, pais in mapa_paises.items():
-        if len(cp) == len(formato) and all(
-            (c.isdigit() if f == "N" else c.isalpha())
-            for c, f in zip(cp.replace("-", ""), formato.replace("-", ""))
-        ):
-            if pais == "Argentina" and provincia == "No aplica":
-                return "Otros"
-            return pais
-    return "Otros"
+    if len(cp) == 8 and cp[0].isalpha() and cp[1:5].isdigit() and cp[5:8].isalpha():
+        return "Argentina" if provincia != "No aplica" else "Otros"
+    elif len(cp) == 4 and cp.isdigit():
+        return "Bolivia"
+    elif len(cp) == 9 and cp[:5].isdigit() and cp[6:].isdigit() and cp[5] == "-":
+        return "Brasil"
+    elif len(cp) == 7 and cp.isdigit():
+        return "Chile"
+    elif len(cp) == 6 and cp.isdigit():
+        return "Paraguay"
+    elif len(cp) == 5 and cp.isdigit():
+        return "Uruguay"
+    else:
+        return "Otros"
 
 
 def calcular_importe_inicial(tipo, cp, pais):
-    base = precios_nacionales[tipo]
+    base = obtener_precio_nacional(tipo)
     if pais == "Argentina":
         return base
-    incremento = 0
-    if pais == "Brasil":
-        region = int(cp[0])
-        if region in range(0, 4):
-            incremento = incrementos_internacionales["Brasil_0_3"]
-        elif region in range(4, 8):
-            incremento = incrementos_internacionales["Brasil_4_7"]
-        else:
-            incremento = incrementos_internacionales["Brasil_8_9"]
-    elif pais in incrementos_internacionales:
-        incremento = incrementos_internacionales[pais]
-    else:
-        incremento = incrementos_internacionales["Otros"]
+    incremento = obtener_incremento_internacional(pais, cp)
     return int(base * (1 + incremento))
 
 
@@ -121,7 +141,7 @@ def calcular_importe_final(inicial, pago):
 cedvalid = 0
 cedinvalid = 0
 
-# Lectura del archivo envios100SC.txt
+# Lectura del archivo envios500b.txt
 with open("envios500b.txt", "r") as archivo:
     lineas = archivo.readlines()
 
@@ -147,7 +167,6 @@ mencp = ""
 
 cant_ext = 0
 montos_buenos_aires = []
-
 
 # Iterar sobre las líneas de envíos
 for linea in lineas[1:]:
@@ -183,7 +202,7 @@ for linea in lineas[1:]:
         montos_buenos_aires.append(final)
         prom = sum(montos_buenos_aires) / len(montos_buenos_aires)
 
-    # Calcular monto inicial y final(NO ANDA Y NO SE PORQUE AAAAAAAAAAAAAAAAAAAA)
+    # Calcular monto inicial y final
     if es_valida:
         imp_acu_total += final
 
@@ -207,7 +226,7 @@ for linea in lineas[1:]:
     if pais != "Argentina" and es_valida:
         cant_ext += 1
     total_envios = sum(tipos_carta)
-    porc = (cant_ext / total_envios) * 100
+    porc = int((cant_ext / total_envios) * 100)
 
     # Para los filtros de brasil
     if pais == "Brasil" and final < menimp:
@@ -229,5 +248,3 @@ print("(r11) - Importe menor pagado por envíos a Brasil:", menimp)
 print("(r12) - Código postal del envío a Brasil con importe menor:", mencp)
 print("(r13) - Porcentaje de envíos al exterior sobre el total:", porc)
 print("(r14) - Importe final promedio de los envíos Buenos Aires:", prom)
-
-# while loop desea continuar?
