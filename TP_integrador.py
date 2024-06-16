@@ -233,18 +233,23 @@ for linea in lineas[1:]:
         menimp = final
         mencp = cp
 
-# Mostrar resultados
-print(f" (r1) - Tipo de control de direcciones:", control)
-print(" (r2) - Cantidad de envios con direccion valida:", cedvalid)
-print(" (r3) - Cantidad de envios con direccion no valida:", cedinvalid)
-print(" (r4) - Total acumulado de importes finales:", imp_acu_total)
-print(" (r5) - Cantidad de cartas simples:", ccs)
-print(" (r6) - Cantidad de cartas certificadas:", ccc)
-print(" (r7) - Cantidad de cartas expresas:", cce)
-print(" (r8) - Tipo de carta con mayor cantidad de envíos:", tipo_mayor)
-print(" (r9) - Código postal del primer envío del archivo:", primer_cp)
-print("(r10) - Cantidad de veces que entró ese primero:", cant_primer_cp)
-print("(r11) - Importe menor pagado por envíos a Brasil:", menimp)
-print("(r12) - Código postal del envío a Brasil con importe menor:", mencp)
-print("(r13) - Porcentaje de envíos al exterior sobre el total:", porc)
-print("(r14) - Importe final promedio de los envíos Buenos Aires:", prom)
+
+def main():
+    # Mostrar resultados
+    print(f" (r1) - Tipo de control de direcciones:", control)
+    print(" (r2) - Cantidad de envios con direccion valida:", cedvalid)
+    print(" (r3) - Cantidad de envios con direccion no valida:", cedinvalid)
+    print(" (r4) - Total acumulado de importes finales:", imp_acu_total)
+    print(" (r5) - Cantidad de cartas simples:", ccs)
+    print(" (r6) - Cantidad de cartas certificadas:", ccc)
+    print(" (r7) - Cantidad de cartas expresas:", cce)
+    print(" (r8) - Tipo de carta con mayor cantidad de envíos:", tipo_mayor)
+    print(" (r9) - Código postal del primer envío del archivo:", primer_cp)
+    print("(r10) - Cantidad de veces que entró ese primero:", cant_primer_cp)
+    print("(r11) - Importe menor pagado por envíos a Brasil:", menimp)
+    print("(r12) - Código postal del envío a Brasil con importe menor:", mencp)
+    print("(r13) - Porcentaje de envíos al exterior sobre el total:", porc)
+    print("(r14) - Importe final promedio de los envíos Buenos Aires:", prom)
+
+if __name__ == '__main__':
+    main()
