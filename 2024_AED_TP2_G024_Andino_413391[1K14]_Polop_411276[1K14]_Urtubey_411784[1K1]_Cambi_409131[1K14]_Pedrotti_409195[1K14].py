@@ -141,7 +141,7 @@ def calcular_importe_final(inicial, pago):
 cedvalid = 0
 cedinvalid = 0
 
-# Lectura del archivo envios.txt
+# Lectura del archivo envios500b.txt
 with open("envios.txt", "r") as archivo:
     lineas = archivo.readlines()
 
