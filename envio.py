@@ -4,7 +4,7 @@ import re
 class Envio:
     def __init__(self, cp, direccion, tipo_envio, tipo_pago):
         self.cp = cp
-        self.direccion = direccion
+        self.direccion = direccion.rstrip(".")
         self.tipo_envio = tipo_envio
         self.tipo_pago = tipo_pago
         self.pais = self.obtener_pais()
