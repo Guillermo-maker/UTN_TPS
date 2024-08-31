@@ -6,16 +6,19 @@ envios = []
 tipo_control = "HC"
 archivo_nombre = "envios100HC.txt"
 
+
 def cargar_envios():
     global envios, tipo_control
     print("Cargando datos desde el archivo...")
     if envios:
-        confirmar = input("Ya existen datos cargados. ¿Desea eliminar los datos actuales y volver a cargar? (s/n): ")
-        if confirmar.lower() != 's':
+        confirmar = input(
+            "Ya existen datos cargados. ¿Desea eliminar los datos actuales y volver a cargar? (s/n): "
+        )
+        if confirmar.lower() != "s":
             return
     with open(archivo_nombre, "r") as archivo:
         lineas = archivo.readlines()
-    
+
     # Procesar timestamp
     timestamp = lineas[0].strip()
     tipo_control = "Hard Control" if "HC" in timestamp else "Soft Control"
@@ -28,17 +31,23 @@ def cargar_envios():
         tipo_pago = int(linea[30])
         envios.append(Envio(cp, direccion, tipo_envio, tipo_pago))
 
+
 def cargar_envio():
     global envios
     cp = input("Ingrese el código postal: ")
     direccion = input("Ingrese la dirección: ")
     tipo_envio = int(input("Ingrese el tipo de envío (0-6): "))
     while tipo_envio < 0 or tipo_envio > 6:
-        tipo_envio = int(input("Tipo de envío inválido. Ingrese el tipo de envío (0-6): "))
+        tipo_envio = int(
+            input("Tipo de envío inválido. Ingrese el tipo de envío (0-6): ")
+        )
     tipo_pago = int(input("Ingrese el tipo de pago (1 o 2): "))
     while tipo_pago not in [1, 2]:
-        tipo_pago = int(input("Tipo de pago inválido. Ingrese el tipo de pago (1 o 2): "))
+        tipo_pago = int(
+            input("Tipo de pago inválido. Ingrese el tipo de pago (1 o 2): ")
+        )
     envios.append(Envio(cp, direccion, tipo_envio, tipo_pago))
+
 
 def mostrar_envios(m=0):
     global envios
@@ -48,12 +57,14 @@ def mostrar_envios(m=0):
     for envio in envios_ordenados[:m]:
         print(envio)
 
+
 def buscar_direccion(d, e):
     for envio in envios:
         if envio.direccion == d and envio.tipo_envio == e:
             print(envio)
             return
     print("No se encontró un envío con esa dirección y tipo.")
+
 
 def buscar_cp(cp):
     for envio in envios:
@@ -80,23 +91,23 @@ def procesar_opciones():
         print("9. Importe promedio y cantidad de envíos por debajo")
         print("0. Salir")
 
-        opcion = int(input("Seleccione una opción: "))
+        opcion = str(input("Seleccione una opción: "))
 
-        if opcion == 1:
+        if opcion == "1":
             cargar_envios()
-        elif opcion == 2:
+        elif opcion == "2":
             cargar_envio()
-        elif opcion == 3:
+        elif opcion == "3":
             m = int(input("¿Cuántos registros desea mostrar? (0 para todos): "))
             mostrar_envios(m)
-        elif opcion == 4:
+        elif opcion == "4":
             d = input("Ingrese la dirección a buscar: ")
             e = int(input("Ingrese el tipo de envío a buscar (0-6): "))
             buscar_direccion(d, e)
-        elif opcion == 5:
+        elif opcion == "5":
             cp = input("Ingrese el código postal a buscar: ")
             buscar_cp(cp)
-        elif opcion == 6:
+        elif opcion == "6":
             if not envios:
                 print("No se han cargado datos aún.")
                 continue
@@ -113,7 +124,7 @@ def procesar_opciones():
             for i in range(7):
                 print(f"Cantidad de envíos para tipo {i}: {conteos[i]}")
 
-        elif opcion == 7:
+        elif opcion == "7":
             if not envios:
                 print("No se han cargado datos aún.")
                 continue
@@ -130,7 +141,7 @@ def procesar_opciones():
             for i in range(7):
                 print(f"Importe acumulado para tipo {i}: {acumuladores[i]}")
 
-        elif opcion == 8:
+        elif opcion == "8":
             if not envios:
                 print("No se han cargado datos aún.")
                 continue
@@ -154,7 +165,7 @@ def procesar_opciones():
             print(f"Importe mayor: {max_importe}")
             print(f"Porcentaje sobre el total: {porcentaje:.2f}%")
 
-        elif opcion == 9:
+        elif opcion == "9":
             if not envios:
                 print("No se han cargado datos aún.")
                 continue
@@ -172,7 +183,7 @@ def procesar_opciones():
                 f"Cantidad de envíos con importe menor al promedio: {menor_al_promedio}"
             )
 
-        elif opcion == 0:
+        elif opcion == "0":
             print("Saliendo del programa...")
             break
 
