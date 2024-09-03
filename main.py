@@ -21,7 +21,11 @@ def cargar_envios():
 
     # Procesar timestamp
     timestamp = lineas[0].strip()
-    tipo_control = "Hard Control" if "HC" in timestamp else "Soft Control"
+    if "HC" in timestamp:
+        tipo_control = "Hard Control"
+    else:
+        tipo_control = "Soft Control"
+
 
     envios = []
     for linea in lineas[1:]:
