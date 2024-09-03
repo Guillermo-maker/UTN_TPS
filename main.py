@@ -4,7 +4,7 @@ from envio import Envio
 
 envios = []
 tipo_control = "HC"
-archivo_nombre = "envios100HC.txt"
+archivo_nombre = "envios-tp3.txt"
 
 
 def cargar_envios():
@@ -53,14 +53,28 @@ def cargar_envio():
     envios.append(Envio(cp, direccion, tipo_envio, tipo_pago))
 
 
-def mostrar_envios(m=0):
+def mostrar_envios(m):
     global envios
-    envios_ordenados = sorted(envios, key=lambda x: x.cp)
-    if m <= 0 or m > len(envios_ordenados):
-        m = len(envios_ordenados)
-    for envio in envios_ordenados[:m]:
-        print(envio)
+    n = len(envios)
+    gap = n // 2
 
+    while gap > 0:
+        for i in range(gap, n):
+            temp = envios[i]
+            j = i
+            while j >= gap and envios[j - gap].cp > temp.cp:
+                envios[j] = envios[j - gap]
+                j -= gap
+            envios[j] = temp
+        gap //= 2
+
+    # Mostrar los envíos
+    if m == 0:
+        for envio in envios:
+            print(envio)
+    else:
+        for envio in envios[:m]:
+            print(envio)
 
 def buscar_direccion(d, e):
     for envio in envios:
@@ -197,3 +211,5 @@ def procesar_opciones():
 
 if __name__ == "__main__":
     procesar_opciones()
+
+
