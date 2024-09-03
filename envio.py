@@ -46,33 +46,56 @@ class Envio:
         return True
 
     def obtener_provincia(self):
-        provincias = {
-            "A": "Salta",
-            "B": "Buenos Aires",
-            "C": "Capital Federal",
-            "D": "San Luis",
-            "E": "Entre Ríos",
-            "F": "La Rioja",
-            "G": "Santiago del Estero",
-            "H": "Chaco",
-            "J": "San Juan",
-            "K": "Catamarca",
-            "L": "La Pampa",
-            "M": "Mendoza",
-            "N": "Misiones",
-            "P": "Formosa",
-            "Q": "Neuquén",
-            "R": "Río Negro",
-            "S": "Santa Fe",
-            "T": "Tucumán",
-            "U": "Chubut",
-            "V": "Tierra del Fuego",
-            "W": "Corrientes",
-            "X": "Córdoba",
-            "Y": "Jujuy",
-            "Z": "Santa Cruz",
-        }
-        return provincias.get(self.cp[0], "No aplica")
+        if self.cp[0] == "A":
+            return "Salta"
+        elif self.cp[0] == "B":
+            return "Buenos Aires"
+        elif self.cp[0] == "C":
+            return "Capital Federal"
+        elif self.cp[0] == "D":
+            return "San Luis"
+        elif self.cp[0] == "E":
+            return "Entre Ríos"
+        elif self.cp[0] == "F":
+            return "La Rioja"
+        elif self.cp[0] == "G":
+            return "Santiago del Estero"
+        elif self.cp[0] == "H":
+            return "Chaco"
+        elif self.cp[0] == "J":
+            return "San Juan"
+        elif self.cp[0] == "K":
+            return "Catamarca"
+        elif self.cp[0] == "L":
+            return "La Pampa"
+        elif self.cp[0] == "M":
+            return "Mendoza"
+        elif self.cp[0] == "N":
+            return "Misiones"
+        elif self.cp[0] == "P":
+            return "Formosa"
+        elif self.cp[0] == "Q":
+            return "Neuquén"
+        elif self.cp[0] == "R":
+            return "Río Negro"
+        elif self.cp[0] == "S":
+            return "Santa Fe"
+        elif self.cp[0] == "T":
+            return "Tucumán"
+        elif self.cp[0] == "U":
+            return "Chubut"
+        elif self.cp[0] == "V":
+            return "Tierra del Fuego"
+        elif self.cp[0] == "W":
+            return "Corrientes"
+        elif self.cp[0] == "X":
+            return "Córdoba"
+        elif self.cp[0] == "Y":
+            return "Jujuy"
+        elif self.cp[0] == "Z":
+            return "Santa Cruz"
+        else:
+            return "No aplica"
 
     def obtener_pais(self):
         provincia = self.obtener_provincia()
