@@ -128,7 +128,7 @@ def procesar_opciones():
         elif opcion == "6":
             if not envios:
                 print("No se han cargado datos aún.")
-                continue
+            
 
             conteos = [0] * 7
             if tipo_control == "Hard Control":
@@ -145,7 +145,7 @@ def procesar_opciones():
         elif opcion == "7":
             if not envios:
                 print("No se han cargado datos aún.")
-                continue
+                
 
             acumuladores = [0] * 7
             if tipo_control == "Hard Control":
@@ -162,7 +162,7 @@ def procesar_opciones():
         elif opcion == "8":
             if not envios:
                 print("No se han cargado datos aún.")
-                continue
+                
 
             if tipo_control == "Hard Control":
                 acumuladores = [0] * 7
@@ -186,11 +186,11 @@ def procesar_opciones():
         elif opcion == "9":
             if not envios:
                 print("No se han cargado datos aún.")
-                continue
+                
 
             if not envios:
                 print("No se han cargado datos aún.")
-                continue
+                
 
             total_importe = sum(envio.final for envio in envios)
             promedio = total_importe / len(envios) if envios else 0
