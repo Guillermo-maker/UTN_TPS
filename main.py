@@ -93,6 +93,26 @@ def buscar_cp(cp):
     print("No se encontró un envío con ese código postal.")
 
 
+def cargar_desde_csv(archivo_csv, archivo_binario):
+    with open(archivo_csv, "r") as csvfile:
+        reader = csv.reader(csvfile)
+        next(reader)  # Saltar la primera línea de descriptores
+        for row in reader:
+            envio = Envio(row[0], row[1], int(row[2]), int(row[3]))
+            envio.escribir_en_archivo_binario(archivo_binario)
+
+
+def leer_envios_binario(archivo_binario):
+    with open(archivo_binario, "rb") as f:
+        while True:
+            try:
+                # Desempaquetar los datos desde binario
+                envio = leer_envio(f)
+                print(envio)
+            except EOFError:
+                break
+
+
 def procesar_opciones():
     global tipo_control, envios
 
@@ -112,7 +132,9 @@ def procesar_opciones():
         opcion = str(input("Seleccione una opción: "))
 
         if opcion == "1":
-            cargar_envios()
+            archivo_csv = input("Ingrese el nombre del archivo CSV: ")
+            cargar_desde_csv(archivo_csv, 'envios.bin')
+
         elif opcion == "2":
             cargar_envio()
         elif opcion == "3":
@@ -211,5 +233,3 @@ def procesar_opciones():
 
 if __name__ == "__main__":
     procesar_opciones()
-
-

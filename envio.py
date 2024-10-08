@@ -139,3 +139,9 @@ class Envio:
     def __str__(self):
         return f"CP: {self.cp}, Dirección: {self.direccion}, Tipo Envio: {self.tipo_envio}, Tipo Pago: {self.tipo_pago}, País: {self.pais}, Importe Inicial: {self.inicial}, Importe Final: {self.final}"
 
+
+def escribir_en_archivo_binario(self, archivo_binario):
+    with open(archivo_binario, "ab") as f:
+        # Empaquetar los datos para binario (por ejemplo, usando struct)
+        # Aquí se deben agregar los datos como bytes
+        pass
