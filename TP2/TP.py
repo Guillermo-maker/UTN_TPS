@@ -1,11 +1,3 @@
-import csv
-import struct
-
-# Estructura del registro en el archivo binario
-FORMATO_BINARIO = "9s20siib"  # CP (9 bytes), Dirección (20 bytes), Tipo Envío (int), Tipo Pago (int), Importe Final (int)
-TAMANIO_REGISTRO = struct.calcsize(FORMATO_BINARIO)
-
-
 # Función para calcular el importe final
 def calcular_importe_inicial(tipo, pais, cp):
     precios = [1100, 1800, 2450, 8300, 10900, 14300, 17900]
@@ -63,29 +55,6 @@ def escribir_envio(f, envio):
         envio["final"],
     )
     f.write(registro)
-
-
-# Función para cargar los datos desde un CSV y guardarlos en un archivo binario
-def cargar_desde_csv(archivo_csv, archivo_binario):
-    with open(archivo_csv, "r") as csvfile, open(archivo_binario, "wb") as binfile:
-        reader = csv.reader(csvfile)
-        next(reader)  # Saltar la primera línea descriptiva
-        for row in reader:
-            cp = row[0].strip()
-            direccion = row[1].strip()
-            tipo_envio = int(row[2])
-            tipo_pago = int(row[3])
-            pais = obtener_pais(cp)
-            inicial = calcular_importe_inicial(tipo_envio, pais, cp)
-            final = calcular_importe_final(inicial, tipo_pago)
-            envio = {
-                "cp": cp,
-                "direccion": direccion,
-                "tipo_envio": tipo_envio,
-                "tipo_pago": tipo_pago,
-                "final": final,
-            }
-            escribir_envio(binfile, envio)
 
 
 # Función para contar los envíos por tipo y forma de pago
