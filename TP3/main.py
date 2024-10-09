@@ -1,10 +1,11 @@
 import re
-
+import pickle
 from envio import Envio
+import csv
 
 envios = []
 tipo_control = "HC"
-archivo_nombre = "envios-tp3.txt"
+archivo_nombre = "envios-tp4.csv"
 
 
 def cargar_envios():
@@ -16,25 +17,7 @@ def cargar_envios():
         )
         if confirmar.lower() != "s":
             return
-    with open(archivo_nombre, "r") as archivo:
-        lineas = archivo.readlines()
-
-    # Procesar timestamp
-    timestamp = lineas[0].strip()
-    if "HC" in timestamp:
-        tipo_control = "Hard Control"
-    else:
-        tipo_control = "Soft Control"
-
-
-    envios = []
-    for linea in lineas[1:]:
-        cp = linea[:9].strip()
-        direccion = linea[9:29].strip()
-        tipo_envio = int(linea[29])
-        tipo_pago = int(linea[30])
-        envios.append(Envio(cp, direccion, tipo_envio, tipo_pago))
-
+    envios = leer_envios_binario('envios.bin')
 
 def cargar_envio():
     global envios
@@ -50,31 +33,44 @@ def cargar_envio():
         tipo_pago = int(
             input("Tipo de pago inválido. Ingrese el tipo de pago (1 o 2): ")
         )
-    envios.append(Envio(cp, direccion, tipo_envio, tipo_pago))
+    envio = Envio(cp, direccion, tipo_envio, tipo_pago)
+    envios.append(envio)
+    with open('envios.bin', "wb") as f:
+        pickle.dump(envios, f)
 
+def mostrar_envios(archivo_binario, m):
+    try:
+        envios = []
+        with open(archivo_binario, "rb") as f:
+            while True:
+                try:
+                    envio = pickle.load(f)
+                    envios.append(envio)
+                except EOFError:
+                    break
 
-def mostrar_envios(m):
-    global envios
-    n = len(envios)
-    gap = n // 2
+        n = len(envios)
+        gap = n // 2
 
-    while gap > 0:
-        for i in range(gap, n):
-            temp = envios[i]
-            j = i
-            while j >= gap and envios[j - gap].cp > temp.cp:
-                envios[j] = envios[j - gap]
-                j -= gap
-            envios[j] = temp
-        gap //= 2
+        while gap > 0:
+            for i in range(gap, n):
+                temp = envios[i]
+                j = i
+                while j >= gap and envios[j - gap].cp > temp.cp:
+                    envios[j] = envios[j - gap]
+                    j -= gap
+                envios[j] = temp
+            gap //= 2
 
-    # Mostrar los envíos
-    if m == 0:
-        for envio in envios:
-            print(envio)
-    else:
-        for envio in envios[:m]:
-            print(envio)
+        # Mostrar los envíos
+        if m == 0:
+            for envio in envios:
+                print(envio)
+        else:
+            for envio in envios[:m]:
+                print(envio)
+    except FileNotFoundError:
+        print("No se encontró el archivo binario")
 
 def buscar_direccion(d, e):
     for envio in envios:
@@ -96,38 +92,42 @@ def buscar_cp(cp):
 def cargar_desde_csv(archivo_csv, archivo_binario):
     with open(archivo_csv, "r") as csvfile:
         reader = csv.reader(csvfile)
-        next(reader)  # Saltar la primera línea de descriptores
-        for row in reader:
-            envio = Envio(row[0], row[1], int(row[2]), int(row[3]))
-            envio.escribir_en_archivo_binario(archivo_binario)
+        next(reader)  # Saltar la primera fila
+        next(reader)  # Saltar la segunda fila
+        with open(archivo_binario, "wb") as f:
+            for row in reader:
+                envio = Envio(row[0], row[1], int(row[2]), int(row[3]))
+                pickle.dump(envio, f)
 
 
 def leer_envios_binario(archivo_binario):
-    with open(archivo_binario, "rb") as f:
-        while True:
-            try:
-                # Desempaquetar los datos desde binario
-                envio = leer_envio(f)
-                print(envio)
-            except EOFError:
-                break
-
+    try:
+        with open(archivo_binario, "rb") as f:
+            envios = pickle.load(f)
+            return envios
+    except FileNotFoundError:
+        print("No se encontró el archivo binario.")
+        return []
 
 def procesar_opciones():
     global tipo_control, envios
 
     while True:
-        print("\nMenú:")
-        print("1. Cargar envíos desde el archivo")
-        print("2. Cargar un nuevo envío")
-        print("3. Mostrar todos los envíos ordenados por código postal")
-        print("4. Buscar por dirección y tipo de envío")
-        print("5. Buscar por código postal y modificar tipo de pago")
-        print("6. Contar envíos según tipo de control")
-        print("7. Acumular importes finales según tipo de control")
-        print("8. Tipo de envío con mayor importe acumulado")
-        print("9. Importe promedio y cantidad de envíos por debajo")
-        print("0. Salir")
+        print("Menú:")
+        print(
+            "1. Cargar envíos desde el archivo: Carga todos los envíos desde el archivo binario y los almacena en memoria.")
+        print(
+            "2. Buscar un envío por dirección postal: Busca y muestra un envío que coincide con una dirección postal específica.")
+        print(
+            "3. Contar envíos según tipo de envío y forma de pago: Cuenta y muestra la cantidad de envíos según su tipo de envío y forma de pago.")
+        print(
+            "4. Totalizar envíos según tipo de envío y forma de pago: Totaliza y muestra la cantidad de envíos según su tipo de envío y forma de pago.")
+        print(
+            "5. Calcular importe promedio y mostrar envíos con importe mayor al promedio: Calcula el importe promedio de los envíos y muestra los envíos que tienen un importe mayor al promedio.")
+        print("6. Cargar un nuevo envío: Permite cargar un nuevo envío manualmente y lo agrega a la lista de envíos.")
+        print(
+            "7. Mostrar todos los envíos ordenados por código postal: Muestra todos los envíos ordenados por código postal utilizando el método Shell Sort.")
+        print("8. Salir: Sale del programa.")
 
         opcion = str(input("Seleccione una opción: "))
 
@@ -139,7 +139,7 @@ def procesar_opciones():
             cargar_envio()
         elif opcion == "3":
             m = int(input("¿Cuántos registros desea mostrar? (0 para todos): "))
-            mostrar_envios(m)
+            mostrar_envios('envios.bin', m)
         elif opcion == "4":
             d = input("Ingrese la dirección a buscar: ")
             e = int(input("Ingrese el tipo de envío a buscar (0-6): "))

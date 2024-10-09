@@ -1,5 +1,5 @@
 import re
-
+import pickle
 
 class Envio:
     def __init__(self, cp, direccion, tipo_envio, tipo_pago):
@@ -11,6 +11,9 @@ class Envio:
         self.inicial = self.calcular_importe_inicial()
         self.final = self.calcular_importe_final()
 
+    def escribir_en_archivo_binario(self, archivo_binario):
+        with open(archivo_binario, "ab") as f:
+            pickle.dump(self, f)
     def obtener_precio_nacional(self):
         precios = [1100, 1800, 2450, 8300, 10900, 14300, 17900]
         return precios[self.tipo_envio] if 0 <= self.tipo_envio < len(precios) else 0
@@ -139,9 +142,3 @@ class Envio:
     def __str__(self):
         return f"CP: {self.cp}, Dirección: {self.direccion}, Tipo Envio: {self.tipo_envio}, Tipo Pago: {self.tipo_pago}, País: {self.pais}, Importe Inicial: {self.inicial}, Importe Final: {self.final}"
 
-
-def escribir_en_archivo_binario(self, archivo_binario):
-    with open(archivo_binario, "ab") as f:
-        # Empaquetar los datos para binario (por ejemplo, usando struct)
-        # Aquí se deben agregar los datos como bytes
-        pass
